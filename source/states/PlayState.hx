@@ -1,5 +1,7 @@
 package states;
 
+import isometric.IsoObject;
+import flixel.util.FlxColor;
 import flixel.util.FlxSort;
 import flixel.group.FlxGroup;
 import flixel.math.FlxRandom;
@@ -21,7 +23,6 @@ using extensions.FlxStateExt;
 class PlayState extends FlxTransitionableState {
 	var player:FlxSprite;
 	var isoWorld:IsoWorld;
-	var grp:FlxTypedGroup<FlxSprite>;
 	var tileFrames:FlxTileFrames;
 	var rnd:FlxRandom;
 
@@ -43,31 +44,23 @@ class PlayState extends FlxTransitionableState {
 		rnd = new FlxRandom();
 
 		isoWorld = new IsoWorld(100, 50);
-		isoWorld.x = 230;
-		isoWorld.y = 200;
 		add(isoWorld);
-
-		grp = new FlxTypedGroup<FlxSprite>();
-		add(grp);
 		gen();
+
+		camera.focusOn(FlxPoint.get());
 	}
 
 	function gen() {
-		for (s in grp) {
+		for (s in isoWorld) {
 			s.kill();
 		}
-		grp.clear();
+		isoWorld.clear();
 		for (x in 0...10) {
 			for (y in 0...10) {
-				var spr = new FlxSprite();
-				var p = isoWorld.isometricToCartesian(x - 5, y - 5);
-				spr.setPosition(p.x, p.y);
-				spr.setFrames(tileFrames, false);
-				spr.frame = tileFrames.frames[rnd.int(0, tileFrames.frames.length)];
-				grp.add(spr);
+				var o = new IsoObject(isoWorld, x - 5, y - 5, 0, -30);
+				o.frame = tileFrames.frames[rnd.int(0, tileFrames.frames.length - 1)];
 			}
 		}
-		grp.sort(FlxSort.byY, FlxSort.ASCENDING);
 	}
 
 	/**
@@ -89,6 +82,16 @@ class PlayState extends FlxTransitionableState {
 
 		if (FlxG.keys.justPressed.SPACE) {
 			gen();
+		}
+
+		for (child in isoWorld) {
+			child.visible = true;
+		}
+
+		var mousePos = FlxG.mouse.getPosition();
+		var hover = isoWorld.getChildAtCartesianPosition(mousePos.x, mousePos.y);
+		if (hover != null) {
+			hover.visible = false;
 		}
 	}
 

@@ -1,12 +1,14 @@
 package isometric;
 
+import flixel.util.FlxSort;
+import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import flixel.util.FlxSpriteUtil;
 import flixel.util.FlxColor;
 import flixel.math.FlxMath;
 import flixel.FlxSprite;
 
-class IsoWorld extends FlxSprite {
+class IsoWorld extends FlxTypedGroup<IsoObject> {
 	private var tileWidth:Int;
 	private var tileHeight:Int;
 
@@ -22,42 +24,38 @@ class IsoWorld extends FlxSprite {
 		halfTileHeight = tileHeight * 0.5;
 	}
 
-	// private function calculateWorldImage() {
-	// 	var totalX = FlxMath.absInt(worldMaxX - worldMinX);
-	// 	var totalY = FlxMath.absInt(worldMaxY - worldMinY);
-	// 	if (totalX == 0 || totalY == 0) {
-	// 		return;
-	// 	}
-	// 	var totalWidth = Std.int((totalX + totalY) * halfTileWidth);
-	// 	var totalHeight = Std.int((totalX + totalY) * halfTileHeight);
-	// 	makeGraphic(totalWidth, totalHeight, 0x55FF00FF, false, "isoworld");
-	// 	var offset = totalHeight * .5 + halfTileHeight;
-	// 	var scaleX = 1.0; // halfTileWidth;
-	// 	var scaleY = 1.0; // halfTileHeight;
-	// 	for (xI in 0...(totalX + 1)) {
-	// 		var isoX = xI * scaleX;
-	// 		var start = isometricToCartesian(isoX, 0);
-	// 		var end = isometricToCartesian(isoX, totalY * halfTileHeight);
-	// 		FlxSpriteUtil.drawLine(this, start.x, -start.y + offset, end.x, -end.y + offset, {thickness: 1, color: 0xFFFF00FF});
-	// 	}
-	// 	for (yI in 0...(totalY + 1)) {
-	// 		var isoY = yI * scaleY;
-	// 		var start = isometricToCartesian(0, isoY).add(-x, -y);
-	// 		var end = isometricToCartesian(totalX * halfTileWidth, isoY).add(-x, -y);
-	// 		FlxSpriteUtil.drawLine(this, start.x, -start.y + offset, end.x, -end.y + offset, {thickness: 1, color: 0xFFFF00FF});
-	// 	}
-	// 	FlxSpriteUtil.drawCircle(this, 0, 0, 5);
-	// }
-	// get the relative isometric coordinate given a standard cartesian (x,y)
-	public function cartesianToIsometric(cartesianX:Float, cartesianY:Float):FlxPoint {
-		var cartX = cartesianX - x;
-		var cartY = cartesianY - y;
-		return FlxPoint.get((cartX / halfTileWidth) - (((cartY / halfTileHeight) + (cartX / halfTileWidth)) / 2.0),
-			((cartY / halfTileHeight) + (cartX / halfTileWidth)) / 2.0);
+	// get the isometric coordinate given a standard cartesian (x,y)
+	public function cartesianToIsometric(cartX:Float, cartY:Float):FlxPoint {
+		return FlxPoint.get((cartX / halfTileWidth) - (((-cartY / halfTileHeight) + (cartX / halfTileWidth)) / 2.0),
+			((-cartY / halfTileHeight) + (cartX / halfTileWidth)) / 2.0);
 	}
 
-	// get the world cartesian point (accounting for this object's x,y) from an isometric coordinate
+	// get the world cartesian point from an isometric coordinate
 	public function isometricToCartesian(isoX:Float, isoY:Float):FlxPoint {
-		return FlxPoint.get((halfTileWidth * isoX) + (halfTileWidth * isoY), (-halfTileHeight * isoX) + (halfTileHeight * isoY)).add(x, y);
+		var p = FlxPoint.get((halfTileWidth * isoX) + (halfTileWidth * isoY), (-halfTileHeight * isoX) + (halfTileHeight * isoY));
+		p.y = -p.y;
+		return p;
+	}
+
+	public function getChildAtCartesianPosition(cartX:Float, cartY:Float):IsoObject {
+		var p = cartesianToIsometric(cartX, cartY);
+		var x = Math.floor(p.x);
+		var y = Math.floor(p.y);
+		var childX:Int = 0;
+		var childY:Int = 0;
+		for (child in this) {
+			childX = Math.floor(child.isoX);
+			childY = Math.floor(child.isoY);
+			if (x == childX && y == childY) {
+				return child;
+			}
+		}
+		return null;
+	}
+
+	public override function add(Object:IsoObject):IsoObject {
+		var o = super.add(Object);
+		sort(FlxSort.byY, FlxSort.ASCENDING);
+		return o;
 	}
 }
