@@ -53,9 +53,16 @@ class IsoWorld extends FlxTypedGroup<IsoObject> {
 		return null;
 	}
 
-	public override function add(Object:IsoObject):IsoObject {
-		var o = super.add(Object);
-		sort(FlxSort.byY, FlxSort.ASCENDING);
-		return o;
+	public override function update(elapsed:Float) {
+		super.update(elapsed);
+		sortIso();
+	}
+
+	private function sortIso() {
+		sort(byIso, FlxSort.ASCENDING);
+	}
+
+	public inline function byIso(order:Int, a:IsoObject, b:IsoObject):Int {
+		return FlxSort.byValues(order, a.y - a.sprOffset.y + (a.elevation * tileHeight), b.y - b.sprOffset.y + (b.elevation * tileHeight));
 	}
 }

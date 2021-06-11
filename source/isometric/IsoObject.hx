@@ -8,7 +8,12 @@ import flixel.FlxBasic;
 class IsoObject extends FlxSprite {
 	public var world:IsoWorld;
 
-	private var sprOffset:FlxPoint = FlxPoint.get();
+	public var elevation:Float = 0.0;
+
+	public var sprOffset:FlxPoint = FlxPoint.get();
+
+	public var isoVelocity:FlxPoint = FlxPoint.get();
+
 	private var iso:FlxPoint = FlxPoint.get();
 
 	public var isoX(get, set):Float;
@@ -40,9 +45,8 @@ class IsoObject extends FlxSprite {
 		iso.y = newY;
 	}
 
-	public function new(world:IsoWorld, isoX:Float = 0.0, isoY:Float = 0.0, offsetX:Float = 0.0, offsetY:Float = 0.0,
-			?image:flixel.system.FlxAssets.FlxGraphicAsset, ?debugColor:FlxColor) {
-		super(0, 0, image);
+	public function new(world:IsoWorld, isoX:Float = 0.0, isoY:Float = 0.0, offsetX:Float = 0.0, offsetY:Float = 0.0) {
+		super();
 		if (world == null) {
 			throw "world must not be null";
 		}
@@ -50,5 +54,14 @@ class IsoObject extends FlxSprite {
 		world.add(this);
 		sprOffset.set(offsetX, offsetY);
 		setIsoPosition(isoX, isoY);
+	}
+
+	public override function update(elapsed:Float) {
+		super.update(elapsed);
+		if (isoVelocity.x != 0 || isoVelocity.y != 0) {
+			setIsoPosition(isoX + isoVelocity.x, isoY + isoVelocity.y);
+		} else if (isoVelocity.y > 0 || isoVelocity.y < 0) {
+			trace("wtf", isoVelocity);
+		}
 	}
 }

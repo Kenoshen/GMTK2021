@@ -15,25 +15,24 @@ import flixel.addons.transition.FlxTransitionableState;
 import signals.Lifecycle;
 import entities.Player;
 import isometric.IsoWorld;
+import isometric.IsoPlayer;
 import flixel.FlxSprite;
 import flixel.FlxG;
 
 using extensions.FlxStateExt;
 
 class PlayState extends FlxTransitionableState {
-	var player:FlxSprite;
+	var player:IsoPlayer;
 	var isoWorld:IsoWorld;
 	var tileFrames:FlxTileFrames;
 	var rnd:FlxRandom;
+	var previousHover:IsoObject;
 
 	override public function create() {
 		super.create();
 		Lifecycle.startup.dispatch();
 
 		FlxG.camera.pixelPerfectRender = true;
-
-		player = new Player();
-		add(player);
 
 		var atlas:FlxAtlas = new FlxAtlas("myAtlas");
 
@@ -47,6 +46,7 @@ class PlayState extends FlxTransitionableState {
 		add(isoWorld);
 		gen();
 
+		player = new IsoPlayer(isoWorld);
 		camera.focusOn(FlxPoint.get());
 	}
 
@@ -84,13 +84,16 @@ class PlayState extends FlxTransitionableState {
 			gen();
 		}
 
-		for (child in isoWorld) {
-			child.visible = true;
-		}
-
 		var mousePos = FlxG.mouse.getPosition();
 		var hover = isoWorld.getChildAtCartesianPosition(mousePos.x, mousePos.y);
 		if (hover != null) {
+			if (previousHover != hover) {
+				if (previousHover != null) {
+					previousHover.visible = true;
+				}
+				previousHover = hover;
+				trace(hover.isoX, hover.isoY);
+			}
 			hover.visible = false;
 		}
 	}
