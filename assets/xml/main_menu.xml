@@ -1,0 +1,10 @@
+<vbox id="vbox1" width="100%" height="100%" >
+    <box width="100%" height="75%" />
+    <box width="100%" height="25%" >
+        <vbox id="menuItems" width="100%" verticalAlign="center" >
+            <button id="playButton" text="Play" horizontalAlign="center" width="60px" />
+            <button id="creditsButton" text="Credits" horizontalAlign="center" width="60px" />
+            <button id="quitButton" text="Quit" horizontalAlign="center" width="60px" />
+        </vbox>
+    </box>
+</vbox>
