@@ -37,7 +37,7 @@ class PlayState extends FlxTransitionableState {
 		var atlas:FlxAtlas = new FlxAtlas("myAtlas");
 
 		// and add nodes (images) to it
-		var tilesNode:FlxNode = createNodeAndDisposeBitmap("assets/images/isometric/tiles.png", atlas);
+		var tilesNode:FlxNode = createNodeAndDisposeBitmap("assets/images/isometric/city_road_isometric_tiles.png", atlas);
 		tileFrames = tilesNode.getTileFrames(FlxPoint.get(100, 80));
 
 		rnd = new FlxRandom();
